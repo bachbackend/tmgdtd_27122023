@@ -7,6 +7,7 @@ import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.Ordered;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
@@ -38,7 +39,8 @@ public class ApplicationSecurity {
 
     @Autowired
     private AccountRepository accountRepository;
-    @Autowired private JwtTokenFilter jwtTokenFilter;
+    @Autowired
+    private JwtTokenFilter jwtTokenFilter;
 
     @Bean
     public UserDetailsService userDetailsService() {
@@ -68,12 +70,20 @@ public class ApplicationSecurity {
     public SecurityFilterChain configure(HttpSecurity http) throws Exception {
         http.csrf().disable();
         http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
-
         http.cors();
-
         http.authorizeRequests()
-                .antMatchers("/persons/login").permitAll()
+                .antMatchers("/persons/login", "/persons/register", "/persons/logout").permitAll()
                 .anyRequest().authenticated();
+
+        http.logout()
+                .logoutUrl("/logout")  // Endpoint xử lý logout
+                .deleteCookies("JSESSIONID") // Xóa cookie nếu có
+                .invalidateHttpSession(true) // Xóa HttpSession
+                .clearAuthentication(true) // Xóa thông tin xác thực
+                .logoutSuccessHandler((request, response, authentication) -> {
+                    response.setStatus(HttpServletResponse.SC_OK);
+                });
+
 
         http.exceptionHandling()
                 .authenticationEntryPoint(
@@ -84,10 +94,24 @@ public class ApplicationSecurity {
                             );
                         }
                 );
-
         http.addFilterBefore(jwtTokenFilter, UsernamePasswordAuthenticationFilter.class);
-
         return http.build();
     }
+
+//    @Bean
+//    public CorsFilter corsFilter() {
+//        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+//        CorsConfiguration config = new CorsConfiguration();
+//        config.setAllowCredentials(true);
+//        config.addAllowedOrigin("*");
+//        config.addAllowedHeader("*");
+//        config.addAllowedMethod(HttpMethod.OPTIONS);
+//        config.addAllowedMethod(HttpMethod.GET);
+//        config.addAllowedMethod(HttpMethod.POST);
+//        config.addAllowedMethod(HttpMethod.PUT);
+//        config.addAllowedMethod(HttpMethod.DELETE);
+//        source.registerCorsConfiguration("/**", config);
+//        return new CorsFilter(source);
+//    }
 
 }

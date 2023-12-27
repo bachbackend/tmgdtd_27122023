@@ -20,17 +20,17 @@ public class Person {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @Column(name = "name")
+    @Column(name = "NAME")
     private String name;
-    @Column(name = "total_money")
+    @Column(name = "TOTAL_MONEY")
     private double totalMoney;
-    @Column(name = "email", unique = true)
+    @Column(name = "EMAIL", unique = true)
     private String email;
-    @Column(name = "phone_number", unique = true)
+    @Column(name = "PHONE_NUMBER", unique = true)
     private String phoneNumber;
-    @Column(name = "age")
+    @Column(name = "AGE")
     private int age;
-    @Column(name = "dob")
+    @Column(name = "DOB")
     private LocalDate dob;
 
     @Transient // Đánh dấu trường này không cần mapping vào cơ sở dữ liệu

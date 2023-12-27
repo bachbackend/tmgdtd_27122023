@@ -9,7 +9,7 @@ import javax.persistence.*;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "login_history")
+@Table(name = "LOGIN_HISTORY")
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
@@ -18,14 +18,14 @@ public class LoginHistory {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @Column(name = "loginDate")
+    @Column(name = "LOGIN_DATE")
     private LocalDateTime loginDate;
 
-    @Column(name = "login_name")
+    @Column(name = "LOGIN_NAME")
     private String userNameHis;
 
     @ManyToOne
-    @JoinColumn(name = "login_id")
+    @JoinColumn(name = "ACCOUNT_ID")
     private Account account;
 
     @Override

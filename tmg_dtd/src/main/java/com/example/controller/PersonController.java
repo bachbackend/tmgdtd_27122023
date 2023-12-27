@@ -8,16 +8,20 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.security.RolesAllowed;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import java.net.URI;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
-@Controller
+@RestController
 @CrossOrigin
 public class PersonController {
 
@@ -161,10 +165,17 @@ public class PersonController {
             // Xóa người dùng
             personRepository.deleteById(id);
 
-            return ResponseEntity.ok("User deleted successfully.");
+//            return ResponseEntity.ok("User deleted successfully.");
+            return ResponseEntity.status(HttpStatus.OK).body("User deleted successfully");
         } else {
             return ResponseEntity.notFound().build();
         }
+
+//        if (personService.existsByEmailOrPhoneNumber(person.getEmail(), person.getPhoneNumber())) {
+//            return ResponseEntity.badRequest().body("Email or phone number already exists.");
+//        }
+//        personService.savePerson(person);
+//        return ResponseEntity.ok("User added successfully.");
     }
 
     @CrossOrigin(origins = "*")
@@ -308,6 +319,7 @@ public class PersonController {
     @RolesAllowed({"ROLE_USER", "ROLE_ADMIN"})
     public ResponseEntity<List<LoginHistory>> getLoginHistory() {
         List<LoginHistory> loginHistories = loginHistoryRepository.findAll();
+        Collections.sort(loginHistories, Comparator.comparing(LoginHistory::getId).reversed());
         return ResponseEntity.ok(loginHistories);
     }
 
@@ -368,9 +380,11 @@ public class PersonController {
     @GetMapping("/persons/loginInfor")
     @RolesAllowed("ROLE_ADMIN")
     public ResponseEntity<List<Account>> getAllLoginInfor() {
-        List<Account> accounts = personService.getAllLoginInfor();
+        List<Account> accounts = accountRepository.findAll();
+        Collections.sort(accounts, Comparator.comparing(Account::getId));
         return ResponseEntity.ok(accounts);
     }
+
 
 //    @CrossOrigin(origins = "*")
 //    @PostMapping("/persons/changePassword")
@@ -397,6 +411,7 @@ public class PersonController {
 //    }
     @CrossOrigin(origins = "*")
     @PostMapping("/{userId}/roles/{roleId}")
+//    @RolesAllowed("ROLE_ADMIN")
     @RolesAllowed("ROLE_ADMIN")
     public ResponseEntity<?> assignRoleToUser(@PathVariable Long userId, @PathVariable Long roleId) {
         return personService.assignRoleToUser(userId, roleId);
@@ -418,6 +433,28 @@ public class PersonController {
     public ResponseEntity<List<Role>> getAllRoles() {
         List<Role> roles = roleRepository.findAll();
         return ResponseEntity.ok(roles);
+    }
+
+//    @CrossOrigin(origins = "*")
+//    @PostMapping("/persons/logout")
+//    public ResponseEntity<String> logout(HttpServletRequest request, HttpServletResponse response) {
+//        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+//        if (auth != null) {
+//            new SecurityContextLogoutHandler().logout(request, response, auth);
+//        }
+//        return ResponseEntity.ok("Logout successful");
+//    }
+
+    @CrossOrigin(origins = "*")
+    @PostMapping("/persons/logout")
+    public ResponseEntity<Map<String, String>> logout(HttpServletRequest request, HttpServletResponse response) {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        if (auth != null) {
+            new SecurityContextLogoutHandler().logout(request, response, auth);
+        }
+        Map<String, String> responseBody = new HashMap<>();
+        responseBody.put("message", "Logout successful");
+        return ResponseEntity.ok(responseBody);
     }
 
 

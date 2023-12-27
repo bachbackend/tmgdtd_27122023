@@ -13,7 +13,7 @@ import java.time.LocalDate;
 import java.util.*;
 
 @Entity
-@Table(name = "login")
+@Table(name = "ACCOUNT")
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
@@ -22,18 +22,18 @@ public class Account implements UserDetails {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @Column(name = "user_name")
+    @Column(name = "USER_NAME")
     private String userName;
-    @Column(name = "password")
+    @Column(name = "PASSWORD")
     private String password;
-    @Column(name = "create_date")
+    @Column(name = "CREATE_DATE")
     private LocalDate createDate;
 
     @ManyToMany
     @JoinTable(
-            name = "logins_roles",
-            joinColumns = @JoinColumn(name = "login_id"),
-            inverseJoinColumns = @JoinColumn(name = "role_id")
+            name = "ACCOUNT_ROLES",
+            joinColumns = @JoinColumn(name = "ACCOUNT_ID"),
+            inverseJoinColumns = @JoinColumn(name = "ROLE_ID")
     )
 
 //    @ManyToMany

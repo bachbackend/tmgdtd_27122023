@@ -7,7 +7,7 @@ import java.text.NumberFormat;
 import java.util.Locale;
 
 @Entity
-@Table(name = "transaction_history")
+@Table(name = "TRANSACTION_HISTORY")
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
@@ -18,38 +18,38 @@ public class TransactionHistory {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "transactionDate")
+    @Column(name = "TRANSACTION_DATE")
     private Date transactionDate;
 
-    @Column(name = "transaction_type")
+    @Column(name = "TRANSACTION_TYPE")
     private String transactionType;
 
-    @Column(name = "transaction_amount")
+    @Column(name = "TRANSACTION_AMOUNT")
     private double transactionAmount;
 
     @ManyToOne
-    @JoinColumn(name = "person_id")
+    @JoinColumn(name = "PERSON_ID")
     private Person person;
 
-    @Column(name = "sub_total")
+    @Column(name = "SUB_TOTAL")
     private double subTotal;
-    @Column(name = "description")
+    @Column(name = "DESCRIPTION")
     private String description;
 
-    @ManyToOne
-    @JoinColumn(name = "login_id")
-    private Account account;
+//    @ManyToOne
+//    @JoinColumn(name = "login_id")
+//    private Account account;
 
     @Transient
     private String formattedSubTotal;
     @Transient
     private String formattedTransactionAmount;
 
-    @Column(name = "user_id")
-    private Long userId;
-
-    @Column(name = "username")
-    private String username;
+//    @Column(name = "user_id")
+//    private Long userId;
+//
+//    @Column(name = "username")
+//    private String username;
 
     public String getFormattedSubTotal() {
         Locale locale = new Locale("vi", "VN");

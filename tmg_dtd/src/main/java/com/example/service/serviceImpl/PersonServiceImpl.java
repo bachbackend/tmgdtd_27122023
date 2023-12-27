@@ -6,9 +6,9 @@ import com.example.jpa.entity.*;
 import com.example.jpa.repository.*;
 import com.example.jwt.JwtTokenUtil;
 import com.example.service.PersonService;
-import io.jsonwebtoken.Claims;
-import org.redisson.api.RLock;
-import org.redisson.api.RedissonClient;
+//import io.jsonwebtoken.Claims;
+//import org.redisson.api.RLock;
+//import org.redisson.api.RedissonClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
@@ -25,9 +25,7 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 public class PersonServiceImpl implements PersonService {
@@ -38,7 +36,6 @@ public class PersonServiceImpl implements PersonService {
     private final AccountRepository accountRepository;
     private final LoginHistoryRepository loginHistoryRepository;
     private final RoleRepository roleRepository;
-
     @Autowired
     AuthenticationManager authenticationManager;
     @Autowired
@@ -145,6 +142,10 @@ public class PersonServiceImpl implements PersonService {
 //        }
     }
 
+//    public List<TransactionHistory> getAllTransactionSortedByDate() {
+//        Sort sort = Sort.by(Sort.Direction.DESC, "transactionDate");
+//        return transactionHistoryRepository.findAll(sort);
+//    }
 
     public List<Person> getAllPersonsSorted(String sortOrder) {
         if (sortOrder.equalsIgnoreCase("ascId")) {
@@ -509,11 +510,9 @@ public class PersonServiceImpl implements PersonService {
                                            List<Double> individualAmounts,
                                            String transactionType,
                                            String description) {
-//        RLock lock = redissonClient.getLock("calculateAndSaveTotalMoneyLock");
-//        try {
-//            lock.lock();
             if (individualAmounts.size() != selectedUserIds.size()) {
                 throw new IllegalArgumentException("Number of individual amounts does not match the number of selected users.");
+
             }
             double sumIndividualAmounts = individualAmounts.stream().mapToDouble(Double::doubleValue).sum();
             if (Math.abs(sumIndividualAmounts - totalAmount) > 0) {
@@ -539,15 +538,10 @@ public class PersonServiceImpl implements PersonService {
                     transactionHistory.setTransactionDate(new Date());
                     transactionHistory.setTransactionType(transactionType);
                     transactionHistory.setTransactionAmount(individualAmount);
-//                    transactionHistory.setAccount(account);
                     transactionHistory.setPerson(person);
                     transactionHistoryRepository.save(transactionHistory);
                 }
             }
-//        } finally {
-//            lock.unlock();
-//        }
-
     }
 
 
@@ -684,18 +678,23 @@ public class PersonServiceImpl implements PersonService {
 
             if (!passwordEncoder.matches(request.getCurrentPassword(), account.getPassword())) {
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Incorrect current password");
+//                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Collections.singletonMap("error", "Incorrect current password"));
             }
-
             if (!request.getNewPassword().equals(request.getConfirmPassword())) {
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Confirm password does not match new password");
+//                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Collections.singletonMap("error", "Confirm password does not match new password"));
+
             }
 
             account.setPassword(passwordEncoder.encode(request.getNewPassword()));
             accountRepository.save(account);
 
+//            return ResponseEntity.ok("Password changed successfully");
             return ResponseEntity.ok("Password changed successfully");
+
         } else {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found");
+//            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Collections.singletonMap("error", "User not found"));
         }
     }
 
@@ -732,15 +731,24 @@ public class PersonServiceImpl implements PersonService {
 
 
     public List<TransactionHistory> getTransactionById(Long id) {
-//        RLock lock = redissonClient.getLock("getTransactionById");
-//        try {
-//            lock.lock();
             List<TransactionHistory> transactionHistories = transactionHistoryRepository.findAllByPersonId(id);
+            Collections.sort(transactionHistories, Comparator.comparing(TransactionHistory::getTransactionDate).reversed());
             return transactionHistories;
-//        } finally {
-//            lock.unlock();
-//        }
     }
+
+//    public List<TransactionHistory> getTransactionById(Long id) {
+//        List<TransactionHistory> transactionHistories = transactionHistoryRepository.findAllByPersonId(id);
+//
+//        // Sắp xếp danh sách theo thuộc tính id
+//        Collections.sort(transactionHistories, Comparator.comparing(TransactionHistory::getId));
+//
+//        return transactionHistories;
+//    }
+
+//    public List<TransactionHistory> getAllTransactionSortedByDate() {
+//        Sort sort = Sort.by(Sort.Direction.DESC, "transactionDate");
+//        return transactionHistoryRepository.findAll(sort);
+//    }
 
     public ResponseEntity<?> assignRoleToUser(Long userId, Long roleId) {
         Account account = accountRepository.findById(userId).orElse(null);

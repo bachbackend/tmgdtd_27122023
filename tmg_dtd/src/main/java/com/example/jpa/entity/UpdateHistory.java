@@ -12,7 +12,7 @@ import java.time.LocalDateTime;
 @Entity
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "update_history")
+@Table(name = "UPDATE_HISTORY")
 @Getter
 @Setter
 public class UpdateHistory {
@@ -20,29 +20,29 @@ public class UpdateHistory {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "update_date")
+    @Column(name = "UPDATE_DATE")
     private LocalDateTime updateDate;
 
-    @Column(name = "update_name")
+    @Column(name = "UPDATE_NAME")
     private String updateName;
 
-    @Column(name = "update_age")
+    @Column(name = "UPDATE_AGE")
     private int updateAge;
 
-    @Column(name = "update_phone")
+    @Column(name = "UPDATE_PHONE")
     private String updatePhone;
 
-    @Column(name = "update_email")
+    @Column(name = "UPDATE_EMAIL")
     private String updateEmail;
 
-    @Column(name = "update_dob")
+    @Column(name = "UPDATE_DOB")
     private LocalDate updateDob;
 
 //    @Column(name = "update_id")
 //    private long updateId;
 
     @ManyToOne
-    @JoinColumn(name = "person_id")
+    @JoinColumn(name = "PERSON_ID")
     private Person person;
 
     public Person getPerson() {
